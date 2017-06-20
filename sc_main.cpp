@@ -1,4 +1,5 @@
-#include "systemc.h"
+#include <systemc>
+#include <uvm>
 #include "Vtinyalu.h"
 
 int sc_main(int argc, char **argv) {
