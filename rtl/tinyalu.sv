@@ -26,11 +26,6 @@ module tinyalu (input [7:0]   A,
    assign done = (op[2]) ? done_mult : done_aax;
 
    assign result = (op[2]) ? result_mult :  result_aax;
-
-   always @(posedge clk) begin
-      $display("hello world!");
-      $finish;
-   end
    
 endmodule // tinyalu
 
