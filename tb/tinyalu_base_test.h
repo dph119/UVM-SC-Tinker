@@ -1,15 +1,37 @@
+#ifndef TINYALU_BASE_TEST_H_
+#define TINYALU_BASE_TEST_H_
+
 #include <systemc>
 #include <uvm>
 
+#include "sequenceA.h"
+#include "env.h"
+
+using namespace sc_core;
 using namespace uvm;
 
 class tinyalu_base_test : public uvm_test {
  public:
+  env* env_h;
+  sequencer<sequence_item, rsp>* sequencer_h;
+  sequenceA<sequence_item, rsp>* sequence_a;
+    
   tinyalu_base_test(uvm_component_name name): uvm_test(name) {}
   
   UVM_COMPONENT_UTILS(tinyalu_base_test);
 
+  void build_phase(uvm_phase& phase) {
+    env_h = env::type_id::create("env_h", this);
+  }
+
+  void end_of_elaboration_phase(uvm_phase& phase) {
+    sequencer_h = env_h->sequencer_h;
+  }
+  
   void run_phase(uvm_phase& phase) {
+    // Instantiate an instance to use
+    sequence_a = new sequenceA<sequence_item, rsp>("some_rando_sequence_name");
+    
     sc_time drain_time = sc_time(12.5, SC_US);
 
     uvm_report_info("drain",
@@ -20,32 +42,20 @@ class tinyalu_base_test : public uvm_test {
     phase.raise_objection(this);
     UVM_INFO(get_name(), "Sup world.", uvm::UVM_INFO);
     sc_core::wait(100, SC_US);
+
+    // create some arbitrary sequence item to pass to the driver
+    SC_FORK
+      sc_core::sc_spawn(sc_bind(&tinyalu_base_test::start_sequence, this))
+    SC_JOIN
+    
     UVM_INFO(get_name(), "Time is passing, right?", uvm::UVM_INFO);    
     phase.drop_objection(this);
   }
 
-  void main_phase(uvm_phase& phase) {
-    UVM_INFO(get_name(), "This is the main phase.", uvm::UVM_INFO);        
+  void start_sequence() {
+    sequence_a->start(sequencer_h, NULL);
   }
   
-  void pre_shutdown_phase(uvm_phase& phase) {
-    UVM_INFO(get_name(), "This is the PRE shutdown phase.", uvm::UVM_INFO);
-  }
-  
-  void shutdown_phase(uvm_phase& phase) {
-    UVM_INFO(get_name(), "This is the shutdown phase.", uvm::UVM_INFO);
-  }
-
-  void report_phase(uvm_phase& phase) {
-    UVM_INFO(get_name(), "This is the report phase.", uvm::UVM_INFO);
-  }
-  
-  void final_phase(uvm_phase& phase) {
-    UVM_INFO(get_name(), "Time is the final phase.", uvm::UVM_INFO);
-    //    phase.drop_objection(this);    
-    //    sc_stop();
-  }
-
   // Use an objection callback do something when objections are raised or
   // dropped (or all dropped). This example prints some information on each
   // drop.
@@ -82,3 +92,5 @@ class tinyalu_base_test : public uvm_test {
   }
   
 };
+
+#endif

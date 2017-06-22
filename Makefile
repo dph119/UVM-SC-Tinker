@@ -1,13 +1,19 @@
 VFILE = Vtinyalu
-CFILES = $(wildcard *h)
+SIM_TOP = sc_main
+
+OUTPUT = out
+
+TBFILES = $(wildcard *.h)
+
+TBDIR = $(abspath tb/)
+TBFILES = $(abspath $(wildcard $(TBDIR)/*h))
 VMAKE = $(VFILE).mk
 CFLAGS = -Wno-WIDTH
-VERILATOR_OUT = out
-VERILATOR_OUT_FILES = $(wildcard $(VERILATOR_OUT)/*)
+OUTPUT_FILES = $(wildcard $(OUTPUT)/*)
 RTLFILES = $(wildcard rtl/*v)
-SIM_TOP = sc_main
-EXEC = $(VERILATOR_OUT)/$(VFILE)
+EXEC = $(OUTPUT)/$(VFILE)
 VCFLAGS = -CFLAGS -I/lib/uvm-systemc/include
+VCFLAGS += -CFLAGS -I$(TBDIR)
 DEBUG = 0
 PREFIX =
 COMPILE_DEBUG =
@@ -24,12 +30,12 @@ run: $(EXEC)
 	$(PREFIX) $(EXEC)
 
 clean:
-	rm -rf $(VERILATOR_OUT)
+	rm -rf $(OUTPUT)
 
-$(VERILATOR_OUT)/$(VMAKE): $(RTLFILES) 
-	verilator $(CFLAGS) --sc $(RTLFILES) --Mdir $(VERILATOR_OUT) $(VCFLAGS)
+$(OUTPUT)/$(VMAKE): $(RTLFILES) 
+	verilator $(CFLAGS) --sc $(RTLFILES) --Mdir $(OUTPUT) $(VCFLAGS) 
 
-$(EXEC): $(VERILATOR_OUT)/$(VMAKE) $(SIM_TOP).cpp $(CFILES)
-	$(MAKE) -j -C $(VERILATOR_OUT) -f $(VMAKE) $(VFILE)__ALL.a
-	$(MAKE) -j -C $(VERILATOR_OUT) -f $(VMAKE) $(SIM_TOP).o verilated.o
-	cd $(VERILATOR_OUT) && g++ $(COMPILE_DEBUG) -L$(SYSTEMC_LIBDIR) -L$(UVM_LIBDIR) $(SIM_TOP).o $(VFILE)__ALL*.o verilated.o -o $(VFILE)  -lsystemc -luvm-systemc
+$(EXEC): $(OUTPUT)/$(VMAKE) $(SIM_TOP).cpp $(TBFILES)
+	$(MAKE) -j -C $(OUTPUT) -f $(VMAKE) $(VFILE)__ALL.a
+	$(MAKE) -j -C $(OUTPUT) -f $(VMAKE) $(SIM_TOP).o verilated.o
+	g++ $(COMPILE_DEBUG) -I$(UVM_INCLUDE) -I$(SYSTEMC_INCLUDE) -L$(SYSTEMC_LIBDIR) -L$(UVM_LIBDIR) $(OUTPUT)/$(SIM_TOP).o $(OUTPUT)/verilated.o $(TBFILES) $(OUTPUT)/$(VFILE)__ALL*.o -o $(OUTPUT)/$(VFILE) -lsystemc -luvm-systemc
