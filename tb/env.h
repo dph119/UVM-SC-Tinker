@@ -5,8 +5,8 @@
 #include <uvm>
 
 #include "sequence_item.h"
-#include "driver.h"
 #include "sequencer.h"
+#include "driver.h"
 
 class env: public uvm::uvm_env {
  public:

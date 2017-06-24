@@ -41,7 +41,7 @@ class base_test : public uvm_test {
     
     phase.raise_objection(this);
     UVM_INFO(get_name(), "Sup world.", uvm::UVM_INFO);
-    sc_core::wait(100, SC_US);
+    sc_core::wait(1000, SC_US);
 
     // create some arbitrary sequence item to pass to the driver
     SC_FORK
@@ -55,42 +55,6 @@ class base_test : public uvm_test {
   void start_sequence() {
     sequence_a->start(sequencer_h, NULL);
   }
-  
-  // Use an objection callback do something when objections are raised or
-  // dropped (or all dropped). This example prints some information on each
-  // drop.
-  virtual void dropped( uvm_objection* objection,
-      uvm_object* source_obj,
-      const std::string& description,
-      int count )
-  {
-    std::ostringstream str;
-    str << count
-        << " objection(s) dropped from "
-        << source_obj->get_full_name()
-        << ", total count is now "
-        << objection->get_objection_total(this)
-        << " top: " << objection->get_objection_total(uvm_root::get());
-
-    uvm_report_info("dropped", str.str(), UVM_NONE);
-  }
-
-  virtual void raised( uvm_objection* objection,
-      uvm_object* source_obj,
-      const std::string& description,
-      int count )
-  {
-    std::ostringstream str;
-    str << count
-        << " objection(s) raised from "
-        << source_obj->get_full_name()
-        << ", total count is now "
-        << objection->get_objection_total(this)
-        << " top: " << objection->get_objection_total(uvm_root::get());
-
-    uvm_report_info("raised", str.str(), UVM_NONE);
-  }
-  
 };
 
 #endif
