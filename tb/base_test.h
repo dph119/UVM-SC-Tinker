@@ -10,15 +10,15 @@
 using namespace sc_core;
 using namespace uvm;
 
-class tinyalu_base_test : public uvm_test {
+class base_test : public uvm_test {
  public:
   env* env_h;
   sequencer<sequence_item, rsp>* sequencer_h;
   sequenceA<sequence_item, rsp>* sequence_a;
     
-  tinyalu_base_test(uvm_component_name name): uvm_test(name) {}
+  base_test(uvm_component_name name): uvm_test(name) {}
   
-  UVM_COMPONENT_UTILS(tinyalu_base_test);
+  UVM_COMPONENT_UTILS(base_test);
 
   void build_phase(uvm_phase& phase) {
     env_h = env::type_id::create("env_h", this);
@@ -45,7 +45,7 @@ class tinyalu_base_test : public uvm_test {
 
     // create some arbitrary sequence item to pass to the driver
     SC_FORK
-      sc_core::sc_spawn(sc_bind(&tinyalu_base_test::start_sequence, this))
+      sc_core::sc_spawn(sc_bind(&base_test::start_sequence, this))
     SC_JOIN
     
     UVM_INFO(get_name(), "Time is passing, right?", uvm::UVM_INFO);    

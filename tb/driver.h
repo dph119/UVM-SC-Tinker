@@ -4,17 +4,17 @@
 // driver to drive the dut
 // is also the bfm
 #include <uvm>
-#include "tinyalu_pkg.h"
+#include "pkg.h"
 
 using namespace sc_core;
 using namespace uvm;
 
 template <typename REQ = uvm::uvm_sequence_item, typename RSP = REQ>
-class tinyalu_driver : public uvm::uvm_driver<REQ, RSP> {
+class driver : public uvm::uvm_driver<REQ, RSP> {
  public:
- tinyalu_driver(uvm::uvm_component_name name) : uvm::uvm_driver<REQ, RSP>(name) {}
+ driver(uvm::uvm_component_name name) : uvm::uvm_driver<REQ, RSP>(name) {}
 
- UVM_COMPONENT_PARAM_UTILS(tinyalu_driver<REQ, RSP>);
+ UVM_COMPONENT_PARAM_UTILS(driver<REQ, RSP>);
 
  // Define interface signals to communicate to DUT
  // You need to check the verilated header file to see

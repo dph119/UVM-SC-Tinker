@@ -6,7 +6,7 @@
 
 // define transactions
 
-#include "tinyalu_pkg.h"
+#include "pkg.h"
 
 class sequence_item : public uvm::uvm_sequence_item {
  public:

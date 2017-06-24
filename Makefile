@@ -24,18 +24,17 @@ ifeq ($(DEBUG), 1)
 	VCFLAGS += -CFLAGS $(COMPILE_DEBUG)
 endif
 
-build: $(EXEC)
+
+$(EXEC): $(OUTPUT)/$(VMAKE) $(SIM_TOP).cpp $(TBFILES)
+	$(MAKE) -j -C $(OUTPUT) -f $(VMAKE) $(VFILE)__ALL.a
+	$(MAKE) -j -C $(OUTPUT) -f $(VMAKE) $(SIM_TOP).o verilated.o
+	g++ $(COMPILE_DEBUG) -I$(UVM_INCLUDE) -I$(SYSTEMC_INCLUDE) -L$(SYSTEMC_LIBDIR) -L$(UVM_LIBDIR) $(OUTPUT)/$(SIM_TOP).o $(OUTPUT)/verilated.o $(TBFILES) $(OUTPUT)/$(VFILE)__ALL*.o -o $(OUTPUT)/$(VFILE) -lsystemc -luvm-systemc
+
+$(OUTPUT)/$(VMAKE): $(RTLFILES) 
+	verilator $(CFLAGS) --sc $(RTLFILES) --Mdir $(OUTPUT) $(VCFLAGS) 
 
 run: $(EXEC)
 	$(PREFIX) $(EXEC)
 
 clean:
 	rm -rf $(OUTPUT)
-
-$(OUTPUT)/$(VMAKE): $(RTLFILES) 
-	verilator $(CFLAGS) --sc $(RTLFILES) --Mdir $(OUTPUT) $(VCFLAGS) 
-
-$(EXEC): $(OUTPUT)/$(VMAKE) $(SIM_TOP).cpp $(TBFILES)
-	$(MAKE) -j -C $(OUTPUT) -f $(VMAKE) $(VFILE)__ALL.a
-	$(MAKE) -j -C $(OUTPUT) -f $(VMAKE) $(SIM_TOP).o verilated.o
-	g++ $(COMPILE_DEBUG) -I$(UVM_INCLUDE) -I$(SYSTEMC_INCLUDE) -L$(SYSTEMC_LIBDIR) -L$(UVM_LIBDIR) $(OUTPUT)/$(SIM_TOP).o $(OUTPUT)/verilated.o $(TBFILES) $(OUTPUT)/$(VFILE)__ALL*.o -o $(OUTPUT)/$(VFILE) -lsystemc -luvm-systemc
