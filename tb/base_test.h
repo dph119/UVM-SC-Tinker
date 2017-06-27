@@ -44,16 +44,10 @@ class base_test : public uvm_test {
     sc_core::wait(1000, SC_US);
 
     // create some arbitrary sequence item to pass to the driver
-    SC_FORK
-      sc_core::sc_spawn(sc_bind(&base_test::start_sequence, this))
-    SC_JOIN
+    sequence_a->start(sequencer_h, NULL);
     
     UVM_INFO(get_name(), "Time is passing, right?", uvm::UVM_INFO);    
     phase.drop_objection(this);
-  }
-
-  void start_sequence() {
-    sequence_a->start(sequencer_h, NULL);
   }
 };
 

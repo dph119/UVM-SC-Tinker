@@ -17,6 +17,11 @@ class env: public uvm::uvm_env {
   
   env(uvm::uvm_component_name name) : uvm::uvm_env(name), sequencer_h(0), driver_h(0) {}
 
+  void final_phase(uvm::uvm_phase& phase) {
+    // Using sc_pause instead of sc_stop simply to avoid a warning about how sc_stop was already called
+    sc_core::sc_pause();
+  }
+    
   void build_phase(uvm::uvm_phase& phase) {
     uvm::uvm_env::build_phase(phase);
 

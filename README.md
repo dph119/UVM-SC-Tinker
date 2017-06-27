@@ -9,4 +9,7 @@ Scratch work to try to convert the UVM-SV code from uvmprimer to UVM-SC. Also ju
     * export VERILATOR_ROOT=/home/dph/verilator
     * export PATH=$VERILATOR_ROOT/bin:$PATH
     * export VERILATOR_INCLUDE=$VERILATOR_ROOT/include
-    
+
+## Hints/Notes
+    * Compile UVM-SC and SystemC with symbols.
+    * GTKWave for waveform viewing
