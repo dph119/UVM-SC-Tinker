@@ -44,7 +44,7 @@ $(EXEC): $(OUTPUT)/$(VMAKE) $(SIM_TOP).cpp $(TBFILES)
 	g++ $(COMPILE_DEBUG) -I$(OUTPUT_ABS) $(WAVE_CPP) -I$(UVM_INCLUDE) -I$(VERILATOR_INCLUDE) -I$(SYSTEMC_INCLUDE) -L$(SYSTEMC_LIBDIR) -L$(UVM_LIBDIR) $(OUTPUT)/$(SIM_TOP).o $(OUTPUT)/verilated.o $(TBFILES) $(OUTPUT)/$(VFILE)__ALL*.o -o $(OUTPUT)/$(VFILE) -lsystemc -luvm-systemc
 
 $(OUTPUT)/$(VMAKE): $(RTLFILES)
-	verilator $(CFLAGS) --sc $(RTLFILES) --Mdir $(OUTPUT) $(VCFLAGS) $(VOPTS) --clk clk
+	verilator $(CFLAGS) --sc $(RTLFILES) --Mdir $(OUTPUT) $(VCFLAGS) $(VOPTS)
 
 run: $(EXEC)
 	$(PREFIX) $(EXEC)

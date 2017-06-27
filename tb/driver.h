@@ -68,12 +68,6 @@ class driver : public uvm::uvm_driver<REQ, RSP> {
  }
 
  void final_phase(uvm::uvm_phase& phase) {
-   // Stop the clock and delete the dut
-  
-   UVM_INFO("driver", "Stopping the clock.", uvm::UVM_INFO);         
-   //   UVM_INFO("driver", "Obliterating DUT.", uvm::UVM_INFO);      
-   //   delete dut;
-
    if (tfp) {
      UVM_INFO("driver", "Dumping/closing waves.", uvm::UVM_INFO);      
      tfp->flush();
@@ -91,28 +85,16 @@ class driver : public uvm::uvm_driver<REQ, RSP> {
 
    assert(dut && "DUT cannot be NULL at this point.");
 
-   UVM_INFO("driver", "Begin run_phase()", uvm::UVM_INFO);
-   
    reset_n = 0;
 
-   /*   clk = 0;
-   sc_core::wait(1, SC_NS);
-   clk = 1;
-   */
+   // TODO: Move into own function. See if we can
+   // set this up in connect_phase()
    UVM_INFO("driver", "Enabling waves...", uvm::UVM_INFO);
    Verilated::traceEverOn(true);   
    tfp = new VerilatedVcdSc;
    dut->trace(tfp, 99);
    tfp->open("vlt_dump.vcd");   
 
-   /*
-   // Separate into own clk driver since sc_clock doesn't seem to be working?
-   for(int i = 0; i < 10000; i++) {
-     clk = clk == 0;
-     sc_core::wait(1, SC_NS);
-     std::cout << i << " " << clk << endl; 
-   }
-   */
    while(true) {
      this->seq_item_port->get(req);
 

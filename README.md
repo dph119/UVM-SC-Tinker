@@ -11,5 +11,5 @@ Scratch work to try to convert the UVM-SV code from uvmprimer to UVM-SC. Also ju
     * export VERILATOR_INCLUDE=$VERILATOR_ROOT/include
 
 ## Hints/Notes
-    * Compile UVM-SC and SystemC with symbols.
+    * Compile UVM-SC and SystemC with symbols
     * GTKWave for waveform viewing
