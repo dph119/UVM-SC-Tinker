@@ -32,10 +32,6 @@ class driver : public uvm::uvm_driver<REQ, RSP> {
  sc_signal<bool> reset_n;
  sc_signal<bool> done;  
  sc_signal<uint32_t > result;
- // For some reason attempting to instantiate sc_clock caused
- // UVM to hang at the end reporting stats at end of test
- // TODO: Try calling dut->final() at the end?
- // sc_signal<bool> clk;
  sc_clock clk;
  
  // Blunder: you can't instantiate during end_of_elaboration(), as SystemC
@@ -50,12 +46,7 @@ class driver : public uvm::uvm_driver<REQ, RSP> {
    
    dut = new Vtinyalu("dut");
 
-   UVM_INFO("driver", "Connecting clock.", uvm::UVM_INFO);   
-   
    dut->clk(clk);
-
-   UVM_INFO("driver", "DONE connecting clock.", uvm::UVM_INFO);
-   
    dut->reset_n(reset_n);
    dut->A(A);
    dut->B(B);
