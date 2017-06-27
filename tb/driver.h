@@ -18,6 +18,7 @@ class driver : public uvm::uvm_driver<REQ, RSP> {
  driver(uvm::uvm_component_name name) : uvm::uvm_driver<REQ, RSP>(name) {}
 
  Vtinyalu* dut;
+ VerilatedVcdSc* tfp;
  
  UVM_COMPONENT_PARAM_UTILS(driver<REQ, RSP>);
 
@@ -35,13 +36,17 @@ class driver : public uvm::uvm_driver<REQ, RSP> {
  // UVM to hang at the end reporting stats at end of test
  // TODO: Try calling dut->final() at the end?
  sc_signal<bool> clk;
-      
- void elaboration_phase(uvm::uvm_phase& phase) {
-   // Set up the DUT and clock
+
+ // Blunder: you can't instantiate during end_of_elaboration(), as SystemC
+ // considers this, well, after the elaboration phase. But that doesn't
+ // mean there's an actual "elaboration_phase" in UVM.
+ // It's annoying if you get your phases mixed up or have a typo in the name, because
+ // you'll just never actually execute the method.
+ // Is there a way to check for this aside from asserts in later phases?
+ void connect_phase(uvm::uvm_phase& phase) {
+   // Set up the DUT 
    UVM_INFO("driver", "Creating/connecting DUT.", uvm::UVM_INFO);
 
-   // Note we can only instantiate during the elaboration phase
-   // SystemC will barf if it sees you try to do it later
    dut = new Vtinyalu("dut");
 
    dut->clk(clk);
@@ -59,6 +64,12 @@ class driver : public uvm::uvm_driver<REQ, RSP> {
    UVM_INFO("driver", "Stopping the clock.", uvm::UVM_INFO);         
    UVM_INFO("driver", "Obliterating DUT.", uvm::UVM_INFO);      
    delete dut;
+
+   if (tfp) {
+     UVM_INFO("driver", "Dumping/closing waves.", uvm::UVM_INFO);      
+     tfp->flush();
+     tfp->close();
+   }
    
    // check remaining objections because why not
    phase.get_objection()->display_objections();
@@ -67,6 +78,8 @@ class driver : public uvm::uvm_driver<REQ, RSP> {
  void run_phase(uvm::uvm_phase& phase) {
    REQ req;
 
+   assert(dut && "DUT cannot be NULL at this point.");
+   
    UVM_INFO("driver", "Starting the clock.", uvm::UVM_INFO);
 
    reset_n = 0;
@@ -77,17 +90,16 @@ class driver : public uvm::uvm_driver<REQ, RSP> {
    
    UVM_INFO("driver", "Enabling waves...", uvm::UVM_INFO);
    Verilated::traceEverOn(true);   
-   VerilatedVcdSc* tfp = new VerilatedVcdSc;
+   tfp = new VerilatedVcdSc;
    dut->trace(tfp, 99);
    tfp->open("vlt_dump.vcd");   
    
    // Separate into own clk driver since sc_clock doesn't seem to be working?
    for(int i = 0; i < 10000; i++) {
-     clk = ~clk;
-     sc_core::wait(1, SC_NS);     
+     clk = clk == 0;
+     sc_core::wait(1, SC_NS);
+     std::cout << i << " " << clk << endl; 
    }
-
-   if (tfp) tfp->close();
    
    while(true) {
      this->seq_item_port->get(req);
