@@ -1,3 +1,4 @@
+# TODO_dhullih: Standardize the variables used for includes/libs
 VFILE = Vtinyalu
 SIM_TOP = sc_main
 
@@ -51,3 +52,4 @@ run: $(EXEC)
 
 clean:
 	rm -rf $(OUTPUT)
+	rm -f *vcd	

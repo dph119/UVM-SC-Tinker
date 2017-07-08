@@ -7,6 +7,8 @@
 int sc_main(int argc, char **argv) {
   Verilated::commandArgs(argc, argv);
 
+  // TODO_dhullih: Take a command-line arg telling us whether to enable waves
+  // Set some flag, pass to driver.h to figure out whether to set up waves
   uvm::run_test("base_test");
 
   // JFC. What's SUPPOSED to happen is UVM calls sc_start() and ticks away until either
